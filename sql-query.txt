@@ -1,0 +1,5 @@
+Query for select:-
+
+    SELECT posts.sno, posts.title, posts.slug, posts.content, posts.date, posts.img_file 
+    FROM posts 
+    WHERE posts.slug = 'first-post'
