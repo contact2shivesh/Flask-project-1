@@ -13,25 +13,25 @@
                 </div>
             </div>
         </header>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+     
+        <ul>
+          {% for category, message in messages %}
+            <li class="alert alert-{{ info }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+    
+    {% endwith %}
+   
         <!-- Main Content-->
         <div class="container px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
-                {% for post in posts %}                              
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="/post/{{post.slug}}">
-                            <h2 class="post-title">{{ post.title }}</h2>
-                            <h3 class="post-subtitle">{{ post.tagline }}</h3>
-                        </a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">{{params['headName']}}</a>
-                            on {{ post.date }}
-                        </p>
-                    </div> 
-                    {{post.content[0:143]}}
-                    {% endfor %}                            
+                Hi, {{  session.get('user') }}  
+
+                 
+                  <a href="/logout">Logout</a>            
+                                    
                     <!-- Divider-->
                     <hr class="my-4" />
                     <!-- Pager-->

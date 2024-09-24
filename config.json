@@ -7,7 +7,11 @@
       "headName": "Coding Builder Hub",
       "subHead":"A Hub of codes on Coding Builder Hub",
       "gmail-user":"contact2shivesh@gmail.com",
-      "gmail-password":"Skt$966143"
+      "gmail-password":"Skt$966143",
+      "login_image":"assets/favicon.ico",
+      "adminUname":"shivesh",
+      "adminPass":"sk123"
+      
 
     
     }

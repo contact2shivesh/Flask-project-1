@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, flash
 import json
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -9,6 +9,8 @@ with open('config.json', 'r') as c:
     params = json.load(c) ["params"]
 
 app = Flask(__name__)
+
+app.secret_key = 'super-secret-key'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@localhost/codingbh'
 db = SQLAlchemy(app)
@@ -26,6 +28,7 @@ class Contacts(db.Model):
 class Posts(db.Model):
     sno= db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80),nullable= False)
+    tagline= db.Column(db.String(120),nullable= False)
     slug = db.Column(db.String(25),nullable= False)
     content = db.Column(db.String(120),nullable= False)
     date = db.Column(db.String(12),nullable= True)
@@ -48,7 +51,8 @@ mail = Mail(app)
 
 @app.route('/')
 def homepage():
-    return render_template('index.py',params=params)
+    posts = Posts.query.filter_by().all()[0:50]
+    return render_template('index.py',params=params,posts=posts)
 
 
 
@@ -77,17 +81,19 @@ def contactpage():
 
 @app.route('/post/<string:post_slug>', methods=['GET'])
 def post_slug_page(post_slug):
-    query = Posts.query.filter_by(slug='post_slug')
+    post = Posts.query.filter_by(slug= post_slug).first()
     
     # Get the SQL statement
-    statement = query.statement
+    #statement = post.statement
     
     # Print the compiled SQL query for MySQL
-    print(statement.compile(dialect=mysql.dialect(), compile_kwargs={"literal_binds": True}))
+    #print(statement.compile(dialect=mysql.dialect(), compile_kwargs={"literal_binds": True}))
 
     # Execute the query
-    post = query.first()
-    return render_template('post.py',params=params,query=query)
+    #query = post.first()
+    #print(post)
+
+    return render_template('post.py',params=params, post=post) 
     
 
 
@@ -113,10 +119,40 @@ def userpage():
     return render_template('user.py',params=params)
 
 
+@app.route("/dashboard", methods = ['GET', 'POST'])
+def dashboard():
+    if ('user' in session and session['user']== params['adminUname']):
+
+        return render_template("dashboard.py",params=params) 
+
+    if(request.method=='POST'):
+       userName= request.form.get('uname')   
+       userPass= request.form.get('pass') 
+
+       if (userName== params['adminUname'] and userPass== params['adminPass'] ):
+        session['user']= userName 
+        flash('You have successfully logged yourself in.') 
+
+        return render_template("dashboard.py",params=params) 
+        
+
+    return render_template('Login.py',params=params)
+
+@app.route('/login')
+def login():
+    return render_template('Login.py',params=params)
+
+@app.route('/logout')
+def logout():
+    if session.get('user'):
+        # prevent flashing automatically logged out message
+        #del session['user']
+        session.pop('user', None)
+        flash('You have successfully logged yourself out.')
+    return render_template('Login.py',params=params)
 
 
 
-app.run(debug=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
